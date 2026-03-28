@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Anti-Pregnancy Tracker | Real-Time Fertility & Intimacy Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 16px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header p {
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            opacity: 0.95;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: clamp(20px, 4vw, 30px);
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* Input Section */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input:active {
+            transform: scale(0.98);
+        }
+
+        .cycle-info {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .cycle-info p {
+            margin: 8px 0;
+        }
+
+        .cycle-info strong {
+            color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Results Section */
+        .results {
+            margin-top: 24px;
+        }
+
+        .status-card {
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+            transition: all 0.3s ease;
+        }
+
+        .danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            animation: pulse 1s ease;
+        }
+
+        .safe {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .period {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .status-card h3 {
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            margin-bottom: 10px;
+        }
+
+        .status-card p {
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            margin: 5px 0;
+        }
+
+        /* Calendar Grid - Responsive */
+        .calendar-wrapper {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: clamp(4px, 1.5vw, 8px);
+            min-width: 280px;
+        }
+
+        .calendar-day {
+            background: #f8f9fa;
+            padding: clamp(8px, 2vw, 12px) clamp(3px, 1vw, 5px);
+            text-align: center;
+            border-radius: 10px;
+            font-size: clamp(11px, 2.5vw, 14px);
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            min-width: 40px;
+            animation: fadeInUp 0.2s ease;
+        }
+
+        @media (max-width: 480px) {
+            .calendar-day {
+                padding: 6px 2px;
+                min-width: 35px;
+            }
+            .calendar-day small {
+                font-size: 8px;
+            }
+        }
+
+        .calendar-day:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .day-safe {
+            background: #4facfe;
+            color: white;
+        }
+
+        .day-danger {
+            background: #f5576c;
+            color: white;
+            animation: gentlePulse 1.5s ease-in-out infinite;
+        }
+
+        .day-period {
+            background: #fee140;
+            color: #333;
+        }
+
+        .day-today {
+            border: 3px solid #667eea;
+            font-weight: bold;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        }
+
+        .day-sex {
+            position: relative;
+        }
+
+        .day-sex::after {
+            content: "❤️";
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-size: clamp(10px, 2.5vw, 12px);
+            animation: heartBeat 1s ease;
+        }
+
+        .weekday-header {
+            background: #667eea;
+            color: white;
+            padding: clamp(8px, 2vw, 12px);
+            text-align: center;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: clamp(11px, 2.5vw, 14px);
+        }
+
+        /* Sex Log Section */
+        .sex-log-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .sex-log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .add-sex-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            width: auto;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .sex-log-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .sex-log-item {
+            background: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            animation: slideInLeft 0.3s ease;
+            transition: all 0.3s ease;
+        }
+
+        .sex-log-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .sex-log-info {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .sex-log-date {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .sex-log-risk {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .risk-high {
+            background: #f5576c;
+            color: white;
+        }
+
+        .risk-low {
+            background: #4facfe;
+            color: white;
+        }
+
+        .risk-medium {
+            background: #ffa500;
+            color: white;
+        }
+
+        .delete-sex-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            width: auto;
+            transition: all 0.2s;
+        }
+
+        .delete-sex-btn:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        .empty-log {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-content {
+            background: white;
+            padding: clamp(20px, 5vw, 30px);
+            border-radius: 20px;
+            max-width: 90%;
+            width: 400px;
+            max-height: 90%;
+            overflow-y: auto;
+            animation: slideInUp 0.3s ease;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        .cancel-btn {
+            background: #6c757d;
+        }
+
+        /* Info Section */
+        .info-section {
+            background: white;
+            border-radius: 20px;
+            padding: clamp(20px, 4vw, 25px);
+            margin-top: 20px;
+        }
+
+        .info-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: clamp(1.1rem, 4vw, 1.3rem);
+        }
+
+        .info-section ul {
+            list-style-position: inside;
+            line-height: 1.8;
+        }
+
+        .info-section li {
+            margin: 10px 0;
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes gentlePulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.9;
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes heartBeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        /* Real-time indicator */
+        .realtime-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            
+            .sex-log-info {
+                flex-direction: column;
+                gap: 5px;
+                align-items: flex-start;
+            }
+            
+            .sex-log-item {
+                flex-direction: column;
+                text-align: left;
+            }
+            
+            .realtime-badge {
+                bottom: 10px;
+                right: 10px;
+                font-size: 10px;
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-grid {
+                gap: 4px;
+            }
+            
+            .weekday-header {
+                font-size: 10px;
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>🌸 Anti-Pregnancy Tracker</span>
+                <span style="font-size: 0.8rem;">⚡ Real-Time</span>
+            </h1>
+            <p>Real-time cycle tracking | Instant updates as you type</p>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 20px; color: #667eea;">📅 Track Your Cycle</h2>
+            
+            <div class="input-group">
+                <label>📆 First day of last period:</label>
+                <input type="date" id="periodStartDate" onchange="realtimeUpdate()" oninput="realtimeUpdate()" required>
+            </div>
+            
+            <div class="input-group">
+                <label>🔄 Average cycle length (days):</label>
+                <input type="number" id="cycleLength" value="28" min="21" max="35" step="1" onchange="realtimeUpdate()" oninput="realtimeUpdate()">
+                <small style="color: #666;">Typical range: 21-35 days</small>
+            </div>
+            
+            <div class="input-group">
+                <label>🩸 Average period duration (days):</label>
+                <input type="number" id="periodDuration" value="5" min="2" max="8" step="1" onchange="realtimeUpdate()" oninput="realtimeUpdate()">
+            </div>
+            
+            <div class="cycle-info" id="cycleInfo" style="display: none;">
+                <p><strong>📊 Your Cycle Information:</strong></p>
+                <p id="infoText"></p>
+            </div>
+        </div>
+
+        <div id="results" style="display: none;">
+            <div class="card">
+                <div id="statusCard"></div>
+                
+                <div class="results">
+                    <h3 style="margin-bottom: 15px;">📅 Fertility Calendar</h3>
+                    <div class="calendar-wrapper" id="calendarWrapper">
+                        <div id="calendar"></div>
+                    </div>
+                </div>
+
+                <div class="sex-log-section">
+                    <div class="sex-log-header">
+                        <h3>💕 Intimacy Log</h3>
+                        <button class="add-sex-btn" onclick="openSexModal()">+ Add Sexual Activity</button>
+                    </div>
+                    <div id="sexLogList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>📖 How to use this tracker</h3>
+            <ul>
+                <li><strong style="color: #f5576c;">🔴 Red (Danger/High Fertility)</strong> - Highest chance of pregnancy. Avoid unprotected sex if you don't want to conceive.</li>
+                <li><strong style="color: #4facfe;">🔵 Blue (Safe/Low Fertility)</strong> - Lower chance of pregnancy, but no method is 100% guaranteed.</li>
+                <li><strong style="color: #fee140;">🟡 Yellow (Period)</strong> - Menstrual period days.</li>
+                <li><strong>❤️ Heart Icon</strong> - Indicates a logged sexual activity on that day.</li>
+                <li><strong>⚡ Real-time Updates</strong> - Calendar and status update instantly as you change any input.</li>
+                <li><strong>📌 How it works:</strong> This tracker uses the calendar/rhythm method. Fertile window is typically 5 days before ovulation and the day of ovulation.</li>
+                <li><strong>⚠️ Important:</strong> This is for educational purposes only. Every woman's cycle is unique. For accurate family planning, consult a healthcare professional.</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>🌸 Anti-Pregnancy Tracker - Real-time cycle awareness for couples 🌸</p>
+            <p style="font-size: 12px; margin-top: 8px;">All data is stored locally on your device | Updates instantly as you type</p>
+        </div>
+    </div>
+
+    <div class="realtime-badge">
+        ⚡ Real-Time Updates Active
+    </div>
+
+    <!-- Modal for adding sex log -->
+    <div id="sexModal" class="modal">
+        <div class="modal-content">
+            <h3>💕 Log Sexual Activity</h3>
+            <div class="input-group">
+                <label>📅 Date:</label>
+                <input type="date" id="sexDate">
+            </div>
+            <div class="input-group">
+                <label>📝 Notes (optional):</label>
+                <input type="text" id="sexNotes" placeholder="e.g., Used protection, etc.">
+            </div>
+            <div class="modal-buttons">
+                <button onclick="saveSexLog()">Save</button>
+                <button class="cancel-btn" onclick="closeSexModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCycleData = null;
+        let sexLogs = [];
+        let updateTimeout = null;
+
+        // Load sex logs from localStorage
+        function loadSexLogs() {
+            const saved = localStorage.getItem('antiPregnancySexLogs');
+            if (saved) {
+                sexLogs = JSON.parse(saved);
+                // Convert string dates back to Date objects
+                sexLogs = sexLogs.map(log => ({
+                    ...log,
+                    date: new Date(log.date)
+                }));
+            }
+            renderSexLogList();
+        }
+
+        // Save sex logs to localStorage
+        function saveSexLogsToStorage() {
+            localStorage.setItem('antiPregnancySexLogs', JSON.stringify(sexLogs));
+        }
+
+        // Add sex log
+        function addSexLog(date, notes = '') {
+            const newLog = {
+                id: Date.now(),
+                date: new Date(date),
+                notes: notes,
+                timestamp: new Date().toISOString()
+            };
+            sexLogs.push(newLog);
+            sexLogs.sort((a, b) => b.date - a.date); // Sort by most recent
+            saveSexLogsToStorage();
+            renderSexLogList();
+            if (currentCycleData) {
+                generateCalendar(); // Refresh calendar to show hearts
+            }
+        }
+
+        // Delete sex log
+        function deleteSexLog(id) {
+            if (confirm('Are you sure you want to remove this entry?')) {
+                sexLogs = sexLogs.filter(log => log.id !== id);
+                saveSexLogsToStorage();
+                renderSexLogList();
+                if (currentCycleData) {
+                    generateCalendar(); // Refresh calendar
+                }
+            }
+        }
+
+        // Get risk level for a specific date
+        function getRiskLevelForDate(date) {
+            if (!currentCycleData) return null;
+            
+            const { lastPeriod, periodEnd, fertileStart, fertileEnd } = currentCycleData;
+            
+            if (date >= lastPeriod && date <= periodEnd) {
+                return { level: 'period', text: 'Menstrual Period', risk: 'low' };
+            } else if (date >= fertileStart && date <= fertileEnd) {
+                return { level: 'danger', text: 'High Fertility - High Risk', risk: 'high' };
+            } else if (currentCycleData.safeStart && date >= currentCycleData.safeStart && date <= currentCycleData.safeEnd) {
+                return { level: 'safe', text: 'Safe Period - Low Risk', risk: 'low' };
+            }
+            return { level: 'unknown', text: 'Outside Range', risk: 'medium' };
+        }
+
+        // Render sex log list
+        function renderSexLogList() {
+            const container = document.getElementById('sexLogList');
+            if (!container) return;
+            
+            if (sexLogs.length === 0) {
+                container.innerHTML = '<div class="empty-log">💕 No intimacy logged yet. Add your first entry!</div>';
+                return;
+            }
+            
+            let html = '<div class="sex-log-list">';
+            sexLogs.forEach(log => {
+                const risk = getRiskLevelForDate(log.date);
+                const riskClass = risk && risk.risk === 'high' ? 'risk-high' : (risk && risk.risk === 'low' ? 'risk-low' : 'risk-medium');
+                const riskText = risk ? risk.text : 'Unknown';
+                
+                html += `
+                    <div class="sex-log-item">
+                        <div class="sex-log-info">
+                            <span class="sex-log-date">📅 ${formatDate(log.date)}</span>
+                            <span class="sex-log-risk ${riskClass}">${riskText}</span>
+                            ${log.notes ? `<span>📝 ${escapeHtml(log.notes)}</span>` : ''}
+                        </div>
+                        <button class="delete-sex-btn" onclick="deleteSexLog(${log.id})">Delete</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Helper to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Check if a date has sex log
+        function hasSexLog(date) {
+            return sexLogs.some(log => log.date.toDateString() === date.toDateString());
+        }
+
+        // Real-time update function - called on any input change
+        function realtimeUpdate() {
+            // Debounce updates for smoother performance
+            if (updateTimeout) {
+                clearTimeout(updateTimeout);
+            }
+            updateTimeout = setTimeout(() => {
+                calculateCycle();
+            }, 100);
+        }
+
+        function calculateCycle() {
+            const startDate = document.getElementById('periodStartDate').value;
+            const cycleLength = parseInt(document.getElementById('cycleLength').value);
+            const periodDuration = parseInt(document.getElementById('periodDuration').value);
+            
+            if (!startDate) {
+                document.getElementById('cycleInfo').style.display = 'none';
+                document.getElementById('results').style.display = 'none';
+                return;
+            }
+            
+            if (cycleLength < 21 || cycleLength > 35) {
+                // Still show but with warning
+                console.warn('Cycle length out of typical range');
+            }
+            
+            const lastPeriod = new Date(startDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Calculate next period date
+            const nextPeriod = new Date(lastPeriod);
+            nextPeriod.setDate(lastPeriod.getDate() + cycleLength);
+            
+            // Calculate ovulation day (typically 14 days before next period)
+            const ovulationDay = new Date(nextPeriod);
+            ovulationDay.setDate(nextPeriod.getDate() - 14);
+            
+            // Fertile window: 5 days before ovulation and day of ovulation
+            const fertileStart = new Date(ovulationDay);
+            fertileStart.setDate(ovulationDay.getDate() - 5);
+            const fertileEnd = new Date(ovulationDay);
+            
+            // Period end date
+            const periodEnd = new Date(lastPeriod);
+            periodEnd.setDate(lastPeriod.getDate() + periodDuration - 1);
+            
+            // Calculate safe days (after fertile window, before next period)
+            const safeStart = new Date(fertileEnd);
+            safeStart.setDate(fertileEnd.getDate() + 1);
+            const safeEnd = new Date(nextPeriod);
+            safeEnd.setDate(nextPeriod.getDate() - 1);
+            
+            currentCycleData = {
+                lastPeriod,
+                nextPeriod,
+                ovulationDay,
+                fertileStart,
+                fertileEnd,
+                periodEnd,
+                safeStart,
+                safeEnd,
+                cycleLength,
+                periodDuration,
+                today
+            };
+            
+            // Show cycle info
+            document.getElementById('cycleInfo').style.display = 'block';
+            document.getElementById('infoText').innerHTML = `
+                Last period: ${formatDate(lastPeriod)}<br>
+                Next period expected: ${formatDate(nextPeriod)}<br>
+                Ovulation day: ${formatDate(ovulationDay)}<br>
+                Fertile window: ${formatDate(fertileStart)} to ${formatDate(fertileEnd)}<br>
+                Safe period: ${formatDate(safeStart)} to ${formatDate(safeEnd)}<br>
+                Cycle length: ${cycleLength} days | Period length: ${periodDuration} days
+            `;
+            
+            // Determine current status
+            determineCurrentStatus();
+            
+            // Generate calendar
+            generateCalendar();
+            
+            // Show results section
+            document.getElementById('results').style.display = 'block';
+            
+            // Update risk colors for sex log entries
+            renderSexLogList();
+        }
+        
+        function determineCurrentStatus() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const { lastPeriod, periodEnd, fertileStart, fertileEnd, safeStart, safeEnd, nextPeriod } = currentCycleData;
+            
+            let status = '';
+            let statusClass = '';
+            let message = '';
+            
+            // Check if currently on period
+            if (today >= lastPeriod && today <= periodEnd) {
+                status = '🩸 Menstrual Period';
+                statusClass = 'period';
+                message = 'You are currently on your period. While pregnancy is unlikely during this time, it\'s not impossible. Your fertile window will begin soon after your period ends.';
+            }
+            // Check if in fertile window
+            else if (today >= fertileStart && today <= fertileEnd) {
+                status = '⚠️ HIGH FERTILITY - DANGER ZONE ⚠️';
+                statusClass = 'danger';
+                message = 'You are in your fertile window! This is the highest risk time for pregnancy. If you want to avoid pregnancy, use protection or abstain from unprotected sex.';
+            }
+            // Check if in safe period
+            else if (today >= safeStart && today <= safeEnd) {
+                status = '✅ SAFE PERIOD - Low Fertility';
+                statusClass = 'safe';
+                message = 'You are currently in your safe period. The chance of pregnancy is lower during this time, but remember that no method is 100% guaranteed.';
+            }
+            // Before period starts
+            else if (today < lastPeriod) {
+                status = '⏳ Waiting for Next Cycle';
+                statusClass = 'safe';
+                message = 'Please enter your next period start date for accurate tracking.';
+            }
+            // After next period should have started
+            else {
+                status = '📝 Period Overdue';
+                statusClass = 'danger';
+                message = 'Your next period appears to be late. Cycles can vary due to stress, illness, or other factors.';
+            }
+            
+            const statusHTML = `
+                <div class="status-card ${statusClass}">
+                    <h3>${status}</h3>
+                    <p>${message}</p>
+                    <p style="margin-top: 15px; font-size: 0.9rem;">📅 Today: ${formatDate(today)}</p>
+                </div>
+            `;
+            
+            document.getElementById('statusCard').innerHTML = statusHTML;
+        }
+        
+        function generateCalendar() {
+            if (!currentCycleData) return;
+            
+            const { lastPeriod, periodEnd, fertileStart, fertileEnd, safeStart, safeEnd, today } = currentCycleData;
+            
+            // Generate 42 days starting from 7 days before period
+            let startDate = new Date(lastPeriod);
+            startDate.setDate(lastPeriod.getDate() - 7);
+            
+            let days = [];
+            for (let i = 0; i < 42; i++) {
+                let currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+                days.push(currentDate);
+            }
+            
+            // Create calendar HTML
+            const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            let calendarHTML = '<div class="calendar-grid">';
+            
+            // Add weekday headers
+            weekdays.forEach(day => {
+                calendarHTML += `<div class="weekday-header">${day}</div>`;
+            });
+            
+            // Add days
+            days.forEach(day => {
+                let dayClass = '';
+                let dayTitle = '';
+                
+                // Determine day type
+                if (day >= lastPeriod && day <= periodEnd) {
+                    dayClass = 'day-period';
+                    dayTitle = 'Period Day';
+                } else if (day >= fertileStart && day <= fertileEnd) {
+                    dayClass = 'day-danger';
+                    dayTitle = 'High Fertility - Danger Zone';
+                } else if (day >= safeStart && day <= safeEnd) {
+                    dayClass = 'day-safe';
+                    dayTitle = 'Safe Period';
+                } else {
+                    dayClass = '';
+                    dayTitle = 'Outside calculated range';
+                }
+                
+                // Check if today
+                const isToday = day.toDateString() === today.toDateString();
+                if (isToday) {
+                    dayClass += ' day-today';
+                }
+                
+                // Check if has sex log
+                const hasSex = hasSexLog(day);
+                if (hasSex) {
+                    dayClass += ' day-sex';
+                    dayTitle += ' ❤️ Intimacy logged';
+                }
+                
+                calendarHTML += `
+                    <div class="calendar-day ${dayClass}" title="${dayTitle}" onclick="openSexModalForDate('${day.toISOString()}')">
+                        ${day.getDate()}<br>
+                        <small style="font-size: 10px;">${getShortMonth(day)}</small>
+                    </div>
+                `;
+            });
+            
+            calendarHTML += '</div>';
+            
+            // Add legend and additional info
+            calendarHTML += `
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                    <p><strong>📊 Calendar Legend:</strong></p>
+                    <p>
+                        <span style="display: inline-block; width: 20px; height: 20px; background: #fee140; border-radius: 3px;"></span> Period Day &nbsp;&nbsp;
+                        <span style="display: inline-block; width: 20px; height: 20px; background: #f5576c; border-radius: 3px;"></span> High Fertility (Danger) &nbsp;&nbsp;
+                        <span style="display: inline-block; width: 20px; height: 20px; background: #4facfe; border-radius: 3px;"></span> Safe/Low Fertility &nbsp;&nbsp;
+                        <span style="display: inline-block; width: 20px; height: 20px; background: transparent; border: 2px solid #ff6b6b; border-radius: 3px; position: relative;">❤️</span> Intimacy Logged
+                    </p>
+                    <p style="margin-top: 10px; font-size: 13px; color: #666;">
+                        💡 <strong>Tip:</strong> Click on any day to log sexual activity. All updates happen in real-time!
+                    </p>
+                </div>
+            `;
+            
+            document.getElementById('calendar').innerHTML = calendarHTML;
+        }
+        
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+        
+        function getShortMonth(date) {
+            return date.toLocaleDateString('en-US', { month: 'short' });
+        }
+        
+        // Modal functions
+        let selectedDateForModal = null;
+        
+        function openSexModal() {
+            document.getElementById('sexDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('sexNotes').value = '';
+            selectedDateForModal = null;
+            document.getElementById('sexModal').style.display = 'flex';
+        }
+        
+        function openSexModalForDate(dateString) {
+            const date = new Date(dateString);
+            document.getElementById('sexDate').value = date.toISOString().split('T')[0];
+            document.getElementById('sexNotes').value = '';
+            selectedDateForModal = date;
+            document.getElementById('sexModal').style.display = 'flex';
+        }
+        
+        function closeSexModal() {
+            document.getElementById('sexModal').style.display = 'none';
+            selectedDateForModal = null;
+        }
+        
+        function saveSexLog() {
+            const dateInput = document.getElementById('sexDate').value;
+            const notes = document.getElementById('sexNotes').value;
+            
+            if (!dateInput) {
+                alert('Please select a date');
+                return;
+            }
+            
+            addSexLog(dateInput, notes);
+            closeSexModal();
+            
+            // Show risk warning if in fertile window
+            const selectedDate = new Date(dateInput);
+            if (currentCycleData) {
+                const risk = getRiskLevelForDate(selectedDate);
+                if (risk && risk.risk === 'high') {
+                    setTimeout(() => {
+                        alert('⚠️ WARNING: This date falls within your fertile window (high risk for pregnancy). If you\'re trying to avoid pregnancy, please use protection or consider emergency contraception if unprotected sex occurred.');
+                    }, 100);
+                }
+            }
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('sexModal');
+            if (event.target === modal) {
+                closeSexModal();
+            }
+        }
+        
+        // Set default date and load with real-time updates
+        window.addEventListener('load', () => {
+            const today = new Date();
+            const defaultPeriodStart = new Date(today);
+            defaultPeriodStart.setDate(today.getDate() - 14);
+            document.getElementById('periodStartDate').value = defaultPeriodStart.toISOString().split('T')[0];
+            
+            loadSexLogs();
+            
+            // Initial calculation
+            setTimeout(() => {
+                calculateCycle();
+            }, 100);
+            
+            // Add event listeners for real-time updates on all inputs
+            const inputs = ['periodStartDate', 'cycleLength', 'periodDuration'];
+            inputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', realtimeUpdate);
+                    element.addEventListener('change', realtimeUpdate);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
